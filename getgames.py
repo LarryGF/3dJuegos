@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import json
 from fire import Fire
 
+base_url = 'https://www.3djuegos.com/novedades/juegos-generos/juegos/{}pf0f0f0/juegos-populares/'
+
 
 def get_game(url):
     r = requests.get(url)
@@ -31,6 +33,16 @@ def get_games_list(url):
     articles = soup.select('article')
 
     return [a.a.attrs['href'] for a in articles]
+
+
+def get_all_games():
+
+    ans = []
+    for i in range(112):
+        ans.extend([get_game(url)
+                    for url in get_games_list(base_url.format(i))])
+
+    return ans
 
 
 if __name__ == "__main__":
