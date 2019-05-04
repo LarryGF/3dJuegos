@@ -5,6 +5,7 @@ import os
 import urllib3
 from fire import Fire
 
+base_number = 0
 base_url = 'https://www.3djuegos.com/novedades/juegos-generos/juegos/{}pf0f0f0/juegos-populares/'
 if not os.path.exists('games'):
      os.makedirs('games')
@@ -42,29 +43,28 @@ def get_games_list(url):
 
 def get_all_games():
 
-    ans = []
-    for i in range(612):
-        for url in get_games_list(base_url.format(i)):
-            game = get_game(url)
-            game['name'] = game['name'].replace('/','-')
-            print(game['name'])
-            if not os.path.exists(os.path.join(games_dir, game['name'] + '.json')):
-                print(game['name']+ ' saving json')
-                json.dump(game, open(os.path.join(games_dir, game['name'] + '.json'), 'w'))
-                thumbnail = requests.get(game['thumbnailUrl'])
-                if not os.path.exists(os.path.join(games_dir, game['name'] + '_th.jpg')):
-                    print(game['name']+ 'saving jpg')
-                    file = open(os.path.join(games_dir, game['name'] + '_th.jpg'), 'wb')
-                    file.write(thumbnail.content)
-                    file.close()
-        # ans.extend([get_game(url)
-        #             for url in get_games_list(base_url.format(i))])
-        # print(ans)
-
+    if os.path.exists('last.json'):
+        base_number = json.load(open('last.json'))['number']
     
-    # json.dump(ans, open('games.json', 'w'))
-
-    # return ans
+    try:
+        for i in range(base_number,612):
+            for url in get_games_list(base_url.format(i)):
+                game = get_game(url)
+                if type(game['name']) == str:
+                    game['name'] = game['name'].replace('/','-')
+                print(game['name'])
+                if not os.path.exists(os.path.join(games_dir, game['name'] + '.json')):
+                    print(game['name']+ ' saving json')
+                    json.dump(game, open(os.path.join(games_dir, game['name'] + '.json'), 'w'))
+                    thumbnail = requests.get(game['thumbnailUrl'])
+                    if not os.path.exists(os.path.join(games_dir, game['name'] + '_th.jpg')):
+                        print(game['name']+ 'saving jpg')
+                        file = open(os.path.join(games_dir, game['name'] + '_th.jpg'), 'wb')
+                        file.write(thumbnail.content)
+                        file.close()
+    except:
+        json.dump({'number':i},open('last.json','w'))
+       
 
 
 if __name__ == "__main__":
