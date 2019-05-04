@@ -48,6 +48,7 @@ def get_all_games():
     
     try:
         for i in range(base_number,612):
+            
             for url in get_games_list(base_url.format(i)):
                 game = get_game(url)
                 if type(game['name']) == str:
@@ -56,16 +57,19 @@ def get_all_games():
                 if not os.path.exists(os.path.join(games_dir, game['name'] + '.json')):
                     print(game['name']+ ' saving json')
                     json.dump(game, open(os.path.join(games_dir, game['name'] + '.json'), 'w'))
-                    thumbnail = requests.get(game['thumbnailUrl'])
-                    if not os.path.exists(os.path.join(games_dir, game['name'] + '_th.jpg')):
-                        print(game['name']+ 'saving jpg')
-                        file = open(os.path.join(games_dir, game['name'] + '_th.jpg'), 'wb')
-                        file.write(thumbnail.content)
-                        file.close()
+                    # thumbnail = requests.get(game['thumbnailUrl'])
+                    # if not os.path.exists(os.path.join(games_dir, game['name'] + '_th.jpg')):
+                    #     print(game['name']+ 'saving jpg')
+                    #     file = open(os.path.join(games_dir, game['name'] + '_th.jpg'), 'wb')
+                    #     file.write(thumbnail.content)
+                    #     file.close()
     except:
+        print('saving last page')
+        print(i)
         json.dump({'number':i},open('last.json','w'))
        
 
 
 if __name__ == "__main__":
-    Fire()
+    # Fire()
+    get_all_games()
