@@ -162,26 +162,6 @@ async def get_all_games(begining=0, end=611):
     manager.stop()  # Clears all temporary counters and progress bars
 
 
-async def download_from(q):
-    while True:
-        code = await q.get()
-        if code is None:
-            # pass on the word that we're done, and exit
-            await q.put(None)
-            break
-        await download(code)
-
-
-async def main(loop):
-    q = asyncio.Queue()
-    dltasks = [loop.create_task(download_from(q)) for _ in range(3)]
-    i = 0
-    while i < 9:
-        await q.put(i)
-        i += 1
-    # Inform the consumers there is no more work.
-    await q.put(None)
-    await asyncio.wait(dltasks)
 
 if __name__ == "__main__":
     # get_all_games()
