@@ -34,6 +34,12 @@ base_path = Path('games')
 games_dir = os.path.join(os.getcwd(), 'games')
 
 
+images_dir = base_path / 'images'
+images_dir.mkdir_p()
+
+thumbails_dir = base_path / 'thumbails'
+thumbails_dir.mkdir_p()
+
 def get_game_data(url):
 
     logger.debug(f'Download game info from: {url}')
@@ -59,14 +65,14 @@ def get_thumbail(data):
         f'Download thumbail of {data["name"]} from: {data["thumbnailUrl"]}')
 
     thumbnail = requests.get(data['thumbnailUrl'])
-    (base_path/data['safe-name'] + '-thumb.jpg').write_bytes(thumbnail.content)
+    (thumbails_dir/data['safe-name'] + '.jpg').write_bytes(thumbnail.content)
 
 
 def get_image(data):
     logger.debug(f'Download image of {data["name"]} from: {data["image"]}')
 
     thumbnail = requests.get(data['image'])
-    (base_path/data['safe-name'] + '.jpg').write_bytes(thumbnail.content)
+    (images_dir/data['safe-name'] + '.jpg').write_bytes(thumbnail.content)
 
 
 def get_games_list(url):
