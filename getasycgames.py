@@ -57,6 +57,7 @@ async def get_game_data(url):
 
     data = json.loads(data.text)
     data['description'] = description
+    data['name'] = str(data['name'])
     data['safe-name'] = slugify(data['name'])
     data['url'] = url
 
@@ -107,7 +108,7 @@ async def get_game(url, game_bar=None):
 
     async with aiofiles.open((base_path/data['safe-name'] + '.json').abspath(), 'w') as outfile:
         await outfile.write(json.dumps(data,
-                                                ensure_ascii=False, indent=2))
+                                       ensure_ascii=False, indent=2))
 
     if Config.thumbnail:
         futures.append(get_thumbail(data))
@@ -129,13 +130,11 @@ async def get_page(url, page_bar=None):
     games_bar = manager.counter(total=len(game_list),
                                 desc='  Game:', unit='games', leave=False)
 
-
     await asyncio.wait([get_game(game, games_bar) for game in game_list])
     games_bar.close()
 
     if page_bar is not None:
         page_bar.update()
-
 
 
 async def arange(*args, **kargs):
@@ -144,7 +143,6 @@ async def arange(*args, **kargs):
 
 async def get_all_games(begining=0, end=611):
     logger.debug(f'From {begining} to {end}')
-
 
     pages = manager.counter(total=end-begining, desc='Page:', unit='pages')
 
@@ -158,7 +156,6 @@ async def get_all_games(begining=0, end=611):
 
         dltasks.add(get_page(base_url.format(i), pages))
 
-    
     # page_future = [get_page(base_url.format(i), pages) for i in range(begining, end)]
 
     await asyncio.wait(dltasks)
@@ -173,6 +170,7 @@ async def download_from(q):
             await q.put(None)
             break
         await download(code)
+
 
 async def main(loop):
     q = asyncio.Queue()

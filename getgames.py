@@ -55,6 +55,7 @@ def get_game_data(url):
 
     data = json.loads(data.text)
     data['description'] = description
+    data['name'] = str(data['name'])
     data['safe-name'] = slugify(data['name'])
     data['url'] = url
 
