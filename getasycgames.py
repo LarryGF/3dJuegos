@@ -137,6 +137,7 @@ async def get_page(url, page_bar=None):
         page_bar.update()
 
 
+
 async def arange(*args, **kargs):
     return range(*args, **kargs)
 
@@ -144,15 +145,47 @@ async def arange(*args, **kargs):
 async def get_all_games(begining=0, end=611):
     logger.debug(f'From {begining} to {end}')
 
+
     pages = manager.counter(total=end-begining, desc='Page:', unit='pages')
 
-    page_future = [get_page(base_url.format(i), pages) for i in range(begining, end)]
+    dltasks = set()
 
-    await asyncio.wait(page_future)
+    for i in range(begining, end):
+
+        if len(dltasks) > 5:
+            _done, dltasks = await asyncio.wait(
+                dltasks, return_when=asyncio.FIRST_COMPLETED)
+
+        dltasks.add(get_page(base_url.format(i), pages))
+
+    
+    # page_future = [get_page(base_url.format(i), pages) for i in range(begining, end)]
+
+    await asyncio.wait(dltasks)
     manager.stop()  # Clears all temporary counters and progress bars
 
+
+async def download_from(q):
+    while True:
+        code = await q.get()
+        if code is None:
+            # pass on the word that we're done, and exit
+            await q.put(None)
+            break
+        await download(code)
+
+async def main(loop):
+    q = asyncio.Queue()
+    dltasks = [loop.create_task(download_from(q)) for _ in range(3)]
+    i = 0
+    while i < 9:
+        await q.put(i)
+        i += 1
+    # Inform the consumers there is no more work.
+    await q.put(None)
+    await asyncio.wait(dltasks)
 
 if __name__ == "__main__":
     # get_all_games()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_all_games(0, 1))
+    loop.run_until_complete(get_all_games(0, 611))
