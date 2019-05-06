@@ -19,8 +19,8 @@ base_url = 'https://www.3djuegos.com/novedades/juegos-generos/juegos/{}pf0f0f0/j
 
 
 class Config():
-    thumbnail = True
-    image = True
+    thumbnail = False
+    image = False
     overwrite = False
 
 
@@ -58,6 +58,7 @@ async def get_game_data(url):
     data = json.loads(data.text)
     data['description'] = description
     data['safe-name'] = slugify(data['name'])
+    data['url'] = url
 
     return data
 
