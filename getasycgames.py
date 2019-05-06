@@ -2,16 +2,12 @@ import requests_async as requests
 from bs4 import BeautifulSoup
 import json
 import os
-import urllib3
-from fire import Fire
 import logging
 from path import Path
 import enlighten
 from slugify import slugify
 import asyncio
 import aiofiles
-import aiostream
-from aiostream.stream import iterate
 
 logger = logging.getLogger('3djuegos')
 logging.basicConfig(level=logging.DEBUG)
@@ -158,4 +154,4 @@ async def get_all_games(begining=0, end=611):
 if __name__ == "__main__":
     # get_all_games()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_all_games(0, 611))
+    loop.run_until_complete(get_all_games(0, 1))
