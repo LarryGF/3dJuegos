@@ -58,7 +58,7 @@ async def get_game_data(url):
     data = json.loads(data.text)
     data['description'] = description
     data['name'] = str(data['name'])
-    data['safe-name'] = slugify(data['name'])
+    data['safe-name'] = slugify(data['name']) + '-[' + data['gamePlatform']+']'
     data['url'] = url
 
     return data
@@ -97,12 +97,44 @@ async def get_games_list(url):
     return [a.a.attrs['href'] for a in articles]
 
 
+def dict_of_elements(elements):
+
+
+    ans = {}
+
+    for line in elements:
+        if ':' in line:
+            left, right = line.split(':')
+            ans[left.strip()] = right.strip()
+
+    return ans
+
+async def requiremts_extract(url):
+    r = await requests.get(url)
+
+    soup = BeautifulSoup(r.text, 'html.parser')
+
+    min, recomend = soup.select('.list_foro')
+
+    min = list(map(lambda x: x.text, min.select('li')))
+    recomend = list(map(lambda x: x.text, recomend.select('li')))
+
+    min_clean = {'min': dict_of_elements(min), 'rec': dict_of_elements(recomend)}
+
+    return min_clean
+
+
 async def get_game(url, game_bar=None):
 
     if url in saved_games and not Config.overwrite:
         return
 
     data = await get_game_data(url)
+
+    if data['gamePlatform'] == 'PC':
+        # TODO: Poner aqui la url que es
+        requiremts_extract(url)
+        pass
 
     futures = []
 
@@ -141,7 +173,7 @@ async def arange(*args, **kargs):
     return range(*args, **kargs)
 
 
-async def get_all_games(begining=0, end=611):
+async def get_all_games(base_url=base_url, begining=0, end=611):
     logger.debug(f'From {begining} to {end}')
 
     pages = manager.counter(total=end-begining, desc='Page:', unit='pages')
@@ -163,7 +195,11 @@ async def get_all_games(begining=0, end=611):
 
 
 
+Config.thumbnail = False
+Config.image = False
+Config.overwrite = False
+
 if __name__ == "__main__":
     # get_all_games()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_all_games(0, 611))
+    loop.run_until_complete(get_all_games(base_url, 0, 100))
