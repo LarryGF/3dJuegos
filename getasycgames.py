@@ -16,7 +16,7 @@ logger.info('This is running SYNC and WITHOUT POOL')
 
 base_number = 0
 base_url = 'https://www.3djuegos.com/novedades/juegos-generos/juegos/{}pf0f0f0/juegos-populares/'
-
+base_url = 'https://www.3djuegos.com/novedades/juegos-generos/juegos-pc/{}f1f0f0/juegos-populares/'
 
 class Config():
     thumbnail = False
@@ -132,9 +132,10 @@ async def get_game(url, game_bar=None):
     data = await get_game_data(url)
 
     if data['gamePlatform'] == 'PC':
-        # TODO: Poner aqui la url que es
-        requiremts_extract(url)
-        pass
+        req_url = url[:25] + 'juegos/requisitos/' + url[26:]
+        print(req_url)
+        req = await requiremts_extract(req_url)
+        data['PCrequirements'] = req
 
     futures = []
 
