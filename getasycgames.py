@@ -104,7 +104,9 @@ def dict_of_elements(elements):
 
     for line in elements:
         if ':' in line:
-            left, right = line.split(':')
+            split = line.split(':')
+            left = split[0]
+            right = ':'.join(split[1:])
             ans[left.strip()] = right.strip()
 
     return ans
@@ -113,8 +115,11 @@ async def requiremts_extract(url):
     r = await requests.get(url)
 
     soup = BeautifulSoup(r.text, 'html.parser')
-
-    min, recomend = soup.select('.list_foro')
+    foro = soup.select('.list_foro')
+    if not foro:
+        logger.debug(f'Not foro in: {url}')
+        return {'min':{}, 'rec':{}}
+    min, recomend = foro
 
     min = list(map(lambda x: x.text, min.select('li')))
     recomend = list(map(lambda x: x.text, recomend.select('li')))
@@ -132,10 +137,20 @@ async def get_game(url, game_bar=None):
     data = await get_game_data(url)
 
     if data['gamePlatform'] == 'PC':
-        req_url = url[:25] + 'juegos/requisitos/' + url[26:]
-        print(req_url)
+
+        req_url = ''
+        if 'juegos' == url.split('/')[3]:
+            req_url = url[:32]  + 'requisitos/' + url[35:]
+
+        else:
+            req_url = url[:25] + 'juegos/requisitos/' + url[25:]
+
         req = await requiremts_extract(req_url)
         data['PCrequirements'] = req
+
+        # except Exception as e:
+        #     logger.error(str(e))
+        #     logger.error(f'Fail url: {req_url}\nFrom: {url}')
 
     futures = []
 
