@@ -10,7 +10,7 @@ import asyncio
 import aiofiles
 
 logger = logging.getLogger('3djuegos')
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 logger.info('This is running SYNC and WITHOUT POOL')
 
