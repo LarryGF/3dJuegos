@@ -1,0 +1,10 @@
+{
+  "base_url": "https://www.3djuegos.com/novedades/juegos-generos/juegos/{}pf0f0f0/juegos-populares/",
+  "thumbnail": false,
+  "image": false,
+  "overwrite": false,
+  "base_path": "games",
+  "database": "games.db",
+  "begining": 0,
+  "end": 611
+}
